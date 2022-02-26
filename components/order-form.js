@@ -27,43 +27,23 @@ const OptionSection = ({ children }) => {
   return <div className="mb-6 flex flex-col items-center">{children}</div>;
 };
 
-export default function Home({ models }) {
+const emptyOptions = {
+  exterior: null,
+  wheels: null,
+  interior: null,
+  seatingLayout: null,
+  fsd: false,
+  orderDate: null,
+  estDateStart: null,
+  estDateEnd: null,
+  pickupDate: null,
+  pickedUp: false,
+  location: '',
+};
+
+export default function OrderForm({ defaultOptions = null, selectedModel, onSubmit }) {
+  const [options, setOptions] = useState(defaultOptions ? defaultOptions : emptyOptions);
   const [loading, setLoading] = useState(false);
-  // console.log(models);
-  const emptyOptions = {
-    exterior: null,
-    wheels: null,
-    interior: null,
-    seatingLayout: null,
-    fsd: false,
-    orderDate: null,
-    estDateStart: null,
-    estDateEnd: null,
-    pickupDate: null,
-    pickedUp: false,
-    location: null,
-  };
-  const [selectedModelGroup, setSelectedModelGroup] = useState(null);
-  const [selectedModel, setSelectedModel] = useState(null);
-  const [availableModels, setAvailableModels] = useState([]);
-  const [options, setOptions] = useState(emptyOptions);
-
-  let modelGroups = [];
-  models.forEach((model) => {
-    if (!modelGroups.includes(model.modelGroup)) {
-      modelGroups.push(model.modelGroup);
-    }
-  });
-
-  useEffect(() => {
-    // setOptions(emptyOptions);
-    // setSelectedModel(null);
-    setAvailableModels(models.filter((model) => model.modelGroup === selectedModelGroup));
-  }, [selectedModelGroup]);
-
-  useEffect(() => {
-    setOptions(emptyOptions);
-  }, [selectedModel]);
 
   const setOption = (option, value) => {
     setOptions({ ...options, [option]: value });
@@ -85,42 +65,13 @@ export default function Home({ models }) {
     setOption('pickupDate', value);
   };
 
-  const onSubmit = () => {
-    const data = {
-      ...options,
-      orderDate: options.orderDate.toISOString(),
-      estDateStart: options.estDateStart.toISOString(),
-      estDateEnd: options.estDateEnd.toISOString(),
-      pickupDate: options?.pickupDate ? options.pickupDate.toISOString() : null,
-    };
-    console.log(data);
+  const updateLocation = (e) => {
+    setOption('location', e.target.value);
   };
 
   return (
     <>
-      <div className="container pt-12 flex flex-col items-center">
-        <h1 className="text-4xl">Tesla Delivery Tracker</h1>
-        <div>Select your model, options, and delivery information below.</div>
-        <div className="pt-12 flex flex-wrap justify-center">
-          {modelGroups &&
-            modelGroups.map((model, index) => {
-              return (
-                <Choice key={index} onClick={() => setSelectedModelGroup(model)} active={selectedModelGroup === model}>
-                  {model}
-                </Choice>
-              );
-            })}
-        </div>
-        <div className="pt-4 border-t flex flex-wrap justify-center">
-          {availableModels &&
-            availableModels.map((model, index) => {
-              return (
-                <Choice key={index} onClick={() => setSelectedModel(model)} active={selectedModel === model}>
-                  {model.name}
-                </Choice>
-              );
-            })}
-        </div>
+      <div className="flex flex-col items-center">
         {selectedModel && (
           <div className="py-12">
             <OptionSection>
@@ -131,8 +82,8 @@ export default function Home({ models }) {
                     return (
                       <Choice
                         key={index}
-                        onClick={() => setOption('exterior', exterior.color)}
-                        active={options.exterior === exterior.color}
+                        onClick={() => setOption('exterior', exterior.id)}
+                        active={options.exterior === exterior.id}
                       >
                         {exterior.color}
                       </Choice>
@@ -148,8 +99,8 @@ export default function Home({ models }) {
                     return (
                       <Choice
                         key={index}
-                        onClick={() => setOption('wheels', wheel.name)}
-                        active={options.wheels === wheel.name}
+                        onClick={() => setOption('wheels', wheel.id)}
+                        active={options.wheels === wheel.id}
                       >
                         {wheel.name}
                       </Choice>
@@ -165,8 +116,8 @@ export default function Home({ models }) {
                     return (
                       <Choice
                         key={index}
-                        onClick={() => setOption('interior', interior.color)}
-                        active={options.interior === interior.color}
+                        onClick={() => setOption('interior', interior.id)}
+                        active={options.interior === interior.id}
                       >
                         {interior.color}
                       </Choice>
@@ -174,7 +125,7 @@ export default function Home({ models }) {
                   })}
               </div>
             </OptionSection>
-            {selectedModel?.seatingLayouts.length ? (
+            {selectedModel?.seatingLayouts?.length ? (
               <OptionSection>
                 <SmallTitle>Seating Layout</SmallTitle>
                 <div className="flex flex-wrap justify-center">
@@ -183,8 +134,8 @@ export default function Home({ models }) {
                       return (
                         <Choice
                           key={index}
-                          onClick={() => setOption('seatingLayout', layout.numberOfSeats)}
-                          active={options.seatingLayout === layout.numberOfSeats}
+                          onClick={() => setOption('seatingLayout', layout.id)}
+                          active={options.seatingLayout === layout.id}
                         >
                           {layout.numberOfSeats}
                         </Choice>
@@ -225,6 +176,26 @@ export default function Home({ models }) {
               </div>
             </OptionSection>
             <OptionSection>
+              <SmallTitle>Delivery Location</SmallTitle>
+              <div className="flex flex-wrap">
+                <select
+                  className="border border-gray-400 px-4 py-3 rounded-full mr-3 mb-3 transition-all text-sm"
+                  onChange={updateLocation}
+                >
+                  <option value="" disabled selected>
+                    Choose Delivery Location
+                  </option>
+                  {locations.map((loc, index) => {
+                    return (
+                      <option key={index} value={loc}>
+                        {loc}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            </OptionSection>
+            <OptionSection>
               <SmallTitle>Did you already pick up your Tesla?</SmallTitle>
 
               <div className="flex flex-wrap justify-center">
@@ -252,11 +223,11 @@ export default function Home({ models }) {
               options.orderDate &&
               options.estDateStart &&
               options.estDateEnd &&
-              ((!selectedModel.seatingLayouts.length && !options.seatingLayout) ||
-                (selectedModel.seatingLayouts.length && options.seatingLayout)) &&
+              ((!selectedModel?.seatingLayouts.length && !options.seatingLayout) ||
+                (selectedModel?.seatingLayouts.length && options.seatingLayout)) &&
               (!options.pickedUp || (options.pickedUp && options.pickupDate)) ? (
                 <button
-                  onClick={onSubmit}
+                  onClick={() => onSubmit(options)}
                   className="bg-blue-600 text-white px-8 py-2 rounded-full uppercase text-xl font-bold transition-all hover:bg-blue-700"
                 >
                   Submit
@@ -270,10 +241,4 @@ export default function Home({ models }) {
       </div>
     </>
   );
-}
-
-export async function getServerSideProps() {
-  const data = await getModels();
-
-  return { props: data };
 }
