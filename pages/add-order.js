@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
 
 import { getModels } from '@lib/api';
 import OrderForm from '@components/order-form';
@@ -23,7 +24,6 @@ export default function Home({ models }) {
   const [selectedModelGroup, setSelectedModelGroup] = useState(null);
   const [selectedModel, setSelectedModel] = useState(null);
   const [availableModels, setAvailableModels] = useState([]);
-  // console.log(models);
 
   let modelGroups = [];
   models.forEach((model) => {
@@ -38,14 +38,15 @@ export default function Home({ models }) {
   }, [selectedModelGroup]);
 
   const onSubmit = async (options) => {
+    setLoading(true);
     if (
       selectedModel &&
       options.exterior &&
-      options.wheels &&
+      options.wheel &&
       options.interior &&
       options.orderDate &&
-      options.estDateStart &&
-      options.estDateEnd &&
+      options.estimatedDeliveryDateStart &&
+      options.estimatedDeliveryDateEnd &&
       options.location &&
       ((!selectedModel?.seatingLayouts.length && !options.seatingLayout) ||
         (selectedModel?.seatingLayouts.length && options.seatingLayout)) &&
@@ -54,10 +55,10 @@ export default function Home({ models }) {
       const data = {
         ...options,
         orderDate: options.orderDate.toISOString(),
-        estDateStart: options.estDateStart.toISOString(),
-        estDateEnd: options.estDateEnd.toISOString(),
+        estimatedDeliveryDateStart: options.estimatedDeliveryDateStart.toISOString(),
+        estimatedDeliveryDateEnd: options.estimatedDeliveryDateEnd.toISOString(),
         pickupDate: options?.pickupDate ? options.pickupDate.toISOString() : null,
-        model: selectedModel.id,
+        model: selectedModel,
       };
 
       const res = await fetch('/api/add', {
@@ -71,11 +72,13 @@ export default function Home({ models }) {
       const json = await res.json();
 
       if (json.errors) {
+        setLoading(false);
         console.error(json.errors);
         throw new Error('Failed to fetch API');
       }
 
       if (json && json?.id) {
+        toast.success('Thanks for adding your order.');
         router.push(`/my-order/${json.id}`);
       }
     }
@@ -116,7 +119,9 @@ export default function Home({ models }) {
           )}
         </div>
 
-        {selectedModel && <OrderForm models={models} selectedModel={selectedModel} onSubmit={onSubmit} />}
+        {selectedModel && (
+          <OrderForm models={models} loading={loading} selectedModel={selectedModel} onSubmit={onSubmit} />
+        )}
       </div>
     </>
   );

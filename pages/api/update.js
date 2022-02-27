@@ -1,7 +1,7 @@
 import { GraphQLClient } from 'graphql-request';
 
 export default async ({ body }, res) => {
-  const { data } = body;
+  const { orderData } = body;
 
   const graphcms = new GraphQLClient('https://api-us-east-1.graphcms.com/v2/cl031zht70cwz01xo5a9j74nk/master', {
     headers: {
@@ -24,24 +24,24 @@ export default async ({ body }, res) => {
           estimatedDeliveryDateEnd: $estDateEnd,
           pickedUp: $pickedUp,
           location: $location
-          ${data.pickedUp ? `, pickupDate: "${data.pickupDate}"` : ``}
-          ${data.seatingLayout ? `, seatingLayout: { connect: { id: "${data.seatingLayout}" } }` : ``}
+          ${orderData.pickedUp ? `, pickupDate: "${orderData.pickupDate}"` : ``}
+          ${orderData.seatingLayout ? `, seatingLayout: { connect: { id: "${orderData.seatingLayout.id}" } }` : ``}
         }) {
         id
       }
     }`,
     {
-      orderID: data.orderID,
-      model: data.model,
-      exterior: data.exterior,
-      wheels: data.wheels,
-      interior: data.interior,
-      fsd: data?.fsd ? true : false,
-      orderDate: data.orderDate,
-      estDateStart: data.estDateStart,
-      estDateEnd: data.estDateEnd,
-      pickedUp: data?.pickedUp ? true : false,
-      location: data.location,
+      orderID: orderData.id,
+      model: orderData.model.id,
+      exterior: orderData.exterior.id,
+      wheels: orderData.wheel.id,
+      interior: orderData.interior.id,
+      fsd: orderData?.fullSelfDriving ? true : false,
+      orderDate: orderData.orderDate,
+      estDateStart: orderData.estimatedDeliveryDateStart,
+      estDateEnd: orderData.estimatedDeliveryDateEnd,
+      pickedUp: orderData?.pickedUp ? true : false,
+      location: orderData.location,
     },
   );
 

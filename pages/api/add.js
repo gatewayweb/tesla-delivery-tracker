@@ -23,20 +23,20 @@ export default async ({ body }, res) => {
           pickedUp: $pickedUp,
           location: $location
           ${data.pickedUp ? `, pickupDate: "${data.pickupDate}"` : ``}
-          ${data.seatingLayout ? `, seatingLayout: { connect: { id: "${data.seatingLayout}" } }` : ``}
+          ${data.seatingLayout ? `, seatingLayout: { connect: { id: "${data.seatingLayout.id}" } }` : ``}
         }) {
         id
       }
     }`,
     {
-      model: data.model,
-      exterior: data.exterior,
-      wheels: data.wheels,
-      interior: data.interior,
-      fsd: data?.fsd ? true : false,
+      model: data.model.id,
+      exterior: data.exterior.id,
+      wheels: data.wheel.id,
+      interior: data.interior.id,
+      fsd: data?.fullSelfDriving ? true : false,
       orderDate: data.orderDate,
-      estDateStart: data.estDateStart,
-      estDateEnd: data.estDateEnd,
+      estDateStart: data.estimatedDeliveryDateStart,
+      estDateEnd: data.estimatedDeliveryDateEnd,
       pickedUp: data?.pickedUp ? true : false,
       location: data.location,
     },

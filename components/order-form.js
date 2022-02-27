@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DatePicker from 'react-date-picker/dist/entry.nostyle';
 import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
@@ -28,39 +28,40 @@ const OptionSection = ({ children }) => {
 
 const emptyOptions = {
   exterior: null,
-  wheels: null,
+  wheel: null,
   interior: null,
   seatingLayout: null,
-  fsd: false,
+  fullSelfDriving: false,
   orderDate: null,
-  estDateStart: null,
-  estDateEnd: null,
+  estimatedDeliveryDateStart: null,
+  estimatedDeliveryDateEnd: null,
   pickupDate: null,
   pickedUp: false,
   location: '',
 };
 
 export default function OrderForm({
-  defaultOptions = null,
+  initialOptions = null,
   selectedModel,
   onSubmit,
   buttonText = 'Submit',
   cancelButton = false,
   onCancel,
+  setData,
+  loading = false,
 }) {
-  const [options, setOptions] = useState(defaultOptions ? defaultOptions : emptyOptions);
-  const [loading, setLoading] = useState(false);
+  const [options, setOptions] = useState(initialOptions ? initialOptions : emptyOptions);
 
   const setOption = (option, value) => {
     setOptions({ ...options, [option]: value });
   };
 
   const setEstDateStart = (value) => {
-    setOption('estDateStart', value);
+    setOption('estimatedDeliveryDateStart', value);
   };
 
   const setEstDateEnd = (value) => {
-    setOption('estDateEnd', value);
+    setOption('estimatedDeliveryDateEnd', value);
   };
 
   const setOrderDate = (value) => {
@@ -74,7 +75,13 @@ export default function OrderForm({
   const updateLocation = (e) => {
     setOption('location', e.target.value);
   };
-  // console.log(options);
+
+  useEffect(() => {
+    if (setData) {
+      setData(options);
+    }
+  }, [options]);
+
   return (
     <>
       <div className="flex flex-col items-center">
@@ -88,8 +95,8 @@ export default function OrderForm({
                     return (
                       <Choice
                         key={index}
-                        onClick={() => setOption('exterior', exterior.id)}
-                        active={options.exterior === exterior.id}
+                        onClick={() => setOption('exterior', exterior)}
+                        active={options.exterior?.id === exterior.id}
                       >
                         {exterior.color}
                       </Choice>
@@ -105,8 +112,8 @@ export default function OrderForm({
                     return (
                       <Choice
                         key={index}
-                        onClick={() => setOption('wheels', wheel.id)}
-                        active={options.wheels === wheel.id}
+                        onClick={() => setOption('wheel', wheel)}
+                        active={options.wheel?.id === wheel.id}
                       >
                         {wheel.name}
                       </Choice>
@@ -122,8 +129,8 @@ export default function OrderForm({
                     return (
                       <Choice
                         key={index}
-                        onClick={() => setOption('interior', interior.id)}
-                        active={options.interior === interior.id}
+                        onClick={() => setOption('interior', interior)}
+                        active={options.interior?.id === interior.id}
                       >
                         {interior.color}
                       </Choice>
@@ -140,8 +147,8 @@ export default function OrderForm({
                       return (
                         <Choice
                           key={index}
-                          onClick={() => setOption('seatingLayout', layout.id)}
-                          active={options.seatingLayout === layout.id}
+                          onClick={() => setOption('seatingLayout', layout)}
+                          active={options.seatingLayout?.id === layout.id}
                         >
                           {layout.numberOfSeats}
                         </Choice>
@@ -156,10 +163,10 @@ export default function OrderForm({
               <SmallTitle>Full Self Driving</SmallTitle>
 
               <div className="flex flex-wrap justify-center">
-                <Choice onClick={() => setOption('fsd', false)} active={!options.fsd}>
+                <Choice onClick={() => setOption('fullSelfDriving', false)} active={!options.fullSelfDriving}>
                   No
                 </Choice>
-                <Choice onClick={() => setOption('fsd', true)} active={options.fsd}>
+                <Choice onClick={() => setOption('fullSelfDriving', true)} active={options.fullSelfDriving}>
                   Yes
                 </Choice>
               </div>
@@ -173,12 +180,20 @@ export default function OrderForm({
                 <SmallTitle>Estimated Delivery Range</SmallTitle>
                 <div className="flex flex-wrap">
                   <div className="w-full md:w-1/2 flex flex-wrap justify-center pb-2 md:pb-0">
-                    <DatePicker onChange={setEstDateStart} value={options.estDateStart} minDate={options.orderDate} />
+                    <DatePicker
+                      onChange={setEstDateStart}
+                      value={options.estimatedDeliveryDateStart}
+                      minDate={options.orderDate}
+                    />
                     <div className="w-full text-sm text-gray-500 uppercase text-center">(Start)</div>
                   </div>
-                  {options.estDateStart ? (
+                  {options.estimatedDeliveryDateStart ? (
                     <div className="w-full md:w-1/2 flex flex-wrap justify-center">
-                      <DatePicker onChange={setEstDateEnd} value={options.estDateEnd} minDate={options.estDateStart} />
+                      <DatePicker
+                        onChange={setEstDateEnd}
+                        value={options.estimatedDeliveryDateEnd}
+                        minDate={options.estimatedDeliveryDateStart}
+                      />
                       <div className="w-full text-sm text-gray-500 uppercase text-center">(End)</div>
                     </div>
                   ) : (
@@ -244,20 +259,21 @@ export default function OrderForm({
 
               {selectedModel &&
               options.exterior &&
-              options.wheels &&
+              options.wheel &&
               options.interior &&
               options.orderDate &&
-              options.estDateStart &&
-              options.estDateEnd &&
+              options.estimatedDeliveryDateStart &&
+              options.estimatedDeliveryDateEnd &&
               options.location &&
               ((!selectedModel?.seatingLayouts.length && !options.seatingLayout) ||
                 (selectedModel?.seatingLayouts.length && options.seatingLayout)) &&
               (!options.pickedUp || (options.pickedUp && options.pickupDate)) ? (
                 <button
+                  disabled={loading}
                   onClick={() => onSubmit(options)}
-                  className="bg-blue-600 text-white px-8 py-2 rounded-full uppercase text-xl font-bold transition-all hover:bg-blue-700"
+                  className="bg-blue-600 text-white px-8 py-2 rounded-full uppercase text-xl font-bold transition-all hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {buttonText}
+                  {!loading ? buttonText : 'Loading...'}
                 </button>
               ) : (
                 <></>
