@@ -37,7 +37,7 @@ export default function Home({ models }) {
   useEffect(() => {
     setSelectedModel(null);
     setAvailableModels(models.filter((model) => model.modelGroup === selectedModelGroup));
-  }, [selectedModelGroup]);
+  }, [selectedModelGroup, models]);
 
   const onSubmit = async (options) => {
     setLoading(true);

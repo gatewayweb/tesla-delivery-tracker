@@ -1,6 +1,6 @@
 import { GraphQLClient } from 'graphql-request';
 
-export default async ({ body }, res) => {
+const update = async ({ body }, res) => {
   const { orderData } = body;
 
   const graphcms = new GraphQLClient('https://api-us-east-1.graphcms.com/v2/cl031zht70cwz01xo5a9j74nk/master', {
@@ -56,3 +56,5 @@ export default async ({ body }, res) => {
 
   res.status(201).json({ id: updateOrder.id });
 };
+
+export default update;

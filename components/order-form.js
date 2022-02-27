@@ -81,7 +81,7 @@ export default function OrderForm({
     if (setData) {
       setData(options);
     }
-  }, [options]);
+  }, [options, setData]);
 
   return (
     <>
