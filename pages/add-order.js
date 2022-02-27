@@ -79,13 +79,30 @@ export default function Home({ models }) {
 
       if (json && json?.id) {
         toast.success('Thanks for adding your order.');
-        router.push(`/my-order/${json.id}`);
+
+        if (typeof window !== 'undefined') {
+          const ordersLocalStorage = window.localStorage.getItem('orders');
+          let orders = [];
+
+          if (ordersLocalStorage) {
+            orders = JSON.parse(ordersLocalStorage);
+          }
+
+          orders.push({ id: json.id, name: selectedModel.name });
+
+          window.localStorage.setItem('orders', JSON.stringify(orders));
+        }
+
+        router.push(`/order/${json.id}`);
       }
     }
   };
 
   return (
     <>
+      <Head>
+        <title>Tesla Delivery Tracker | Add Order</title>
+      </Head>
       <div className="container flex flex-col items-center">
         <h1 className="text-4xl">Tesla Delivery Tracker</h1>
         <div>Select your model, options, and delivery information below.</div>

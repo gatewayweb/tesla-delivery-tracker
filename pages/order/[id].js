@@ -87,61 +87,71 @@ export default function MyOrder({ order }) {
   };
 
   return (
-    <div className="container w-full flex flex-col items-center">
-      <div className="pb-6 w-full flex flex-col items-center">
-        <h1 className="text-4xl">My Order</h1>
-        <div className="uppercase text-sm text-gray-500 pt-2">
-          <strong>Order ID:</strong> {data.id}
-        </div>
-        <div className="text-sm text-gray-500 pt-2">
-          <strong>Make sure to save this order ID so you can get back to this page!</strong>
-          <br />
-          You can update your order on this page as delivery dates change, etc.
-        </div>
-      </div>
-
-      {!editing ? (
-        <>
-          <LineItem name="Exterior" value={data.exterior.color} />
-          <LineItem name="Wheels" value={data.wheel.name} />
-          <LineItem name="Interior" value={data.interior.color} />
-          {data?.seatingLayout ? <LineItem name="Seating layout" value={data.seatingLayout.numberOfSeats} /> : <></>}
-          <LineItem name="Full Self Driving" value={data.fullSelfDriving ? 'Yes' : 'No'} />
-          <LineItem name="Order Date" value={data.orderDate.toLocaleDateString('en-US')} />
-          <LineItem
-            name="Estimated Delivery"
-            value={`${data.estimatedDeliveryDateStart.toLocaleDateString(
-              'en-US',
-            )} - ${data.estimatedDeliveryDateEnd.toLocaleDateString('en-US')}`}
-          />
-          <LineItem name="Location" value={data.location} />
-          <LineItem name="Picked Up?" value={data.pickedUp ? 'Yes' : 'No'} />
-          {data.pickedUp ? <LineItem name="Pickup Date" value={data.pickupDate.toLocaleDateString('en-US')} /> : <></>}
-          <div className="pt-6">
-            <button
-              onClick={() => setEditing(true)}
-              disabled={loading}
-              className="bg-blue-600 text-white px-8 py-2 rounded-full uppercase text-xl font-bold transition-all hover:bg-blue-700"
-            >
-              Update my Order
-            </button>
+    <>
+      <Head>
+        <title>Tesla Delivery Tracker | My Order</title>
+      </Head>
+      <div className="container w-full flex flex-col items-center">
+        <div className="pb-6 w-full flex flex-col items-center">
+          <h1 className="text-4xl">My Order</h1>
+          <div className="uppercase text-sm text-gray-500 pt-2">
+            <strong>Order ID:</strong> {data.id}
           </div>
-        </>
-      ) : (
-        <>
-          <OrderForm
-            initialOptions={data}
-            selectedModel={data.model}
-            onSubmit={onSubmit}
-            onCancel={() => setEditing(false)}
-            buttonText="Update"
-            cancelButton={true}
-            setData={setData}
-            loading={loading}
-          />
-        </>
-      )}
-    </div>
+          <div className="text-sm text-gray-500 pt-2">
+            <strong>Make sure to save this order ID so you can get back to this page!</strong>
+            <br />
+            You can update your order on this page as delivery dates change, etc.
+          </div>
+        </div>
+
+        {!editing ? (
+          <>
+            <LineItem name="Model" value={data.model.name} />
+            <LineItem name="Exterior" value={data.exterior.color} />
+            <LineItem name="Wheels" value={data.wheel.name} />
+            <LineItem name="Interior" value={data.interior.color} />
+            {data?.seatingLayout ? <LineItem name="Seating layout" value={data.seatingLayout.numberOfSeats} /> : <></>}
+            <LineItem name="Full Self Driving" value={data.fullSelfDriving ? 'Yes' : 'No'} />
+            <LineItem name="Order Date" value={data.orderDate.toLocaleDateString('en-US')} />
+            <LineItem
+              name="Estimated Delivery"
+              value={`${data.estimatedDeliveryDateStart.toLocaleDateString(
+                'en-US',
+              )} - ${data.estimatedDeliveryDateEnd.toLocaleDateString('en-US')}`}
+            />
+            <LineItem name="Location" value={data.location} />
+            <LineItem name="Picked Up?" value={data.pickedUp ? 'Yes' : 'No'} />
+            {data.pickedUp ? (
+              <LineItem name="Pickup Date" value={data.pickupDate.toLocaleDateString('en-US')} />
+            ) : (
+              <></>
+            )}
+            <div className="pt-6">
+              <button
+                onClick={() => setEditing(true)}
+                disabled={loading}
+                className="bg-blue-600 text-white px-8 py-2 rounded-full uppercase text-xl font-bold transition-all hover:bg-blue-700"
+              >
+                Update my Order
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <OrderForm
+              initialOptions={data}
+              selectedModel={data.model}
+              onSubmit={onSubmit}
+              onCancel={() => setEditing(false)}
+              buttonText="Update"
+              cancelButton={true}
+              setData={setData}
+              loading={loading}
+            />
+          </>
+        )}
+      </div>
+    </>
   );
 }
 
