@@ -10,7 +10,7 @@ export default function Home() {
       </Head>
       <div className="container flex flex-col items-center">
         <h1>Track Tesla Deliveries</h1>
-        <div className="w-64 max-w-full">
+        <div className="w-64 max-w-full pt-10">
           <Image width={392} height={600} src="/haha-yes.png" />
         </div>
         <div className="pt-10">

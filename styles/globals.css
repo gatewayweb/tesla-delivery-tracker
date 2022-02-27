@@ -36,3 +36,6 @@
 .react-calendar__tile--now {
   @apply !bg-red-100;
 }
+.Toastify__toast-body {
+  font-family: 'Gotham';
+}

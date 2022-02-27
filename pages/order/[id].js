@@ -27,8 +27,9 @@ const LineItem = ({ name, value }) => {
 };
 
 export default function MyOrder({ order }) {
-  const router = useRouter();
-
+  if (!order || !order.id) {
+    return <div className="pt-12 text-lg text-center">Order not found.</div>;
+  }
   order.orderDate = formatDate(order.dates.orderDate);
   order.pickupDate = formatDate(order.dates.pickupDate);
   order.estimatedDeliveryDateStart = formatDate(order.dates.estimatedDeliveryDateStart);
@@ -146,13 +147,22 @@ export default function MyOrder({ order }) {
 
 export async function getServerSideProps({ params, res }) {
   const { id } = params;
-  const order = await getOrder(id);
+  const order = (await getOrder(id)) || {};
+
+  // if (!order || !order.id) {
+  //   return {
+  //     redirect: {
+  //       destination: '/',
+  //       permanent: false,
+  //     },
+  //   };
+  // }
 
   order.dates = {
-    orderDate: order.orderDate,
-    estimatedDeliveryDateStart: order.estimatedDeliveryDateStart,
-    estimatedDeliveryDateEnd: order.estimatedDeliveryDateEnd,
-    pickupDate: order.pickupDate,
+    orderDate: order?.orderDate || null,
+    estimatedDeliveryDateStart: order?.estimatedDeliveryDateStart || null,
+    estimatedDeliveryDateEnd: order?.estimatedDeliveryDateEnd || null,
+    pickupDate: order?.pickupDate || null,
   };
 
   return { props: { order } };
