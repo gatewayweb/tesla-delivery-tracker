@@ -87,7 +87,7 @@ export default function MyOrder({ order }) {
   };
 
   return (
-    <div className="container pt-12 w-full flex flex-col items-center">
+    <div className="container w-full flex flex-col items-center">
       <div className="pb-6 w-full flex flex-col items-center">
         <h1 className="text-4xl">My Order</h1>
         <div className="uppercase text-sm text-gray-500 pt-2">

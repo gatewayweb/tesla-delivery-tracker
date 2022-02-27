@@ -86,7 +86,7 @@ export default function Home({ models }) {
 
   return (
     <>
-      <div className="container pt-12 flex flex-col items-center">
+      <div className="container flex flex-col items-center">
         <h1 className="text-4xl">Tesla Delivery Tracker</h1>
         <div>Select your model, options, and delivery information below.</div>
         <div className="p-6 mt-12 bg-gray-50 rounded-lg">
