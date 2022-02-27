@@ -9,9 +9,11 @@ export default async ({ body }, res) => {
     },
   });
 
-  const { createOrder } = await graphcms.request(
-    `mutation createOrder($model: ID!, $exterior: ID!, $wheels: ID!, $interior: ID!, $fsd: Boolean!, $orderDate: Date!, $estDateStart: Date!, $estDateEnd: Date!, $pickedUp: Boolean!, $location: String!) {
-      createOrder(data: {
+  const { updateOrder } = await graphcms.request(
+    `mutation updateOrder($orderID: ID!, $model: ID!, $exterior: ID!, $wheels: ID!, $interior: ID!, $fsd: Boolean!, $orderDate: Date!, $estDateStart: Date!, $estDateEnd: Date!, $pickedUp: Boolean!, $location: String!) {
+      updateOrder(
+        where: { id: $orderID }
+        data: {
           model: { connect: { id: $model } },
           exterior: { connect: { id: $exterior } },
           wheel: { connect: { id:  $wheels } },
@@ -29,6 +31,7 @@ export default async ({ body }, res) => {
       }
     }`,
     {
+      orderID: data.orderID,
       model: data.model,
       exterior: data.exterior,
       wheels: data.wheels,
@@ -48,8 +51,8 @@ export default async ({ body }, res) => {
         id
       }
     }`,
-    { id: createOrder.id },
+    { id: updateOrder.id },
   );
 
-  res.status(201).json({ id: createOrder.id });
+  res.status(201).json({ id: updateOrder.id });
 };

@@ -23,3 +23,14 @@
     @apply font-bold;
   }
 }
+.react-date-picker__wrapper {
+  @apply !border-gray-400 border rounded-full w-full px-4 py-3 font-bold;
+  font-family: 'Gotham';
+}
+.react-date-picker__calendar .react-calendar {
+  @apply !border-gray-200 border rounded-2xl text-gray-500 p-4 font-bold drop-shadow-xl;
+  font-family: 'Gotham';
+}
+.react-calendar__tile--now {
+  @apply !bg-red-100;
+}

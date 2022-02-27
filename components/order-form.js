@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import DatePicker from 'react-date-picker/dist/entry.nostyle';
 import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
 
-import { getModels } from '@lib/api';
 import locations from '@lib/locations';
 
 const Choice = ({ children, onClick, active }) => {
@@ -24,7 +23,7 @@ const SmallTitle = ({ children }) => {
 };
 
 const OptionSection = ({ children }) => {
-  return <div className="mb-6 flex flex-col items-center">{children}</div>;
+  return <div className="mb-6 flex flex-col items-center border-b pb-6">{children}</div>;
 };
 
 const emptyOptions = {
@@ -41,7 +40,14 @@ const emptyOptions = {
   location: '',
 };
 
-export default function OrderForm({ defaultOptions = null, selectedModel, onSubmit }) {
+export default function OrderForm({
+  defaultOptions = null,
+  selectedModel,
+  onSubmit,
+  buttonText = 'Submit',
+  cancelButton = false,
+  onCancel,
+}) {
   const [options, setOptions] = useState(defaultOptions ? defaultOptions : emptyOptions);
   const [loading, setLoading] = useState(false);
 
@@ -68,7 +74,7 @@ export default function OrderForm({ defaultOptions = null, selectedModel, onSubm
   const updateLocation = (e) => {
     setOption('location', e.target.value);
   };
-
+  // console.log(options);
   return (
     <>
       <div className="flex flex-col items-center">
@@ -162,27 +168,36 @@ export default function OrderForm({ defaultOptions = null, selectedModel, onSubm
               <SmallTitle>Order Date</SmallTitle>
               <DatePicker onChange={setOrderDate} value={options.orderDate} />
             </OptionSection>
-            <OptionSection>
-              <SmallTitle>Estimated Delivery Range</SmallTitle>
-              <div className="flex flex-wrap">
-                <div className="w-full lg:w-1/2 flex flex-wrap justify-center pb-2 lg:pb-0">
-                  <DatePicker onChange={setEstDateStart} value={options.estDateStart} />
-                  <div className="w-full text-sm text-gray-500 uppercase text-center">(Start)</div>
+            {options.orderDate ? (
+              <OptionSection>
+                <SmallTitle>Estimated Delivery Range</SmallTitle>
+                <div className="flex flex-wrap">
+                  <div className="w-full md:w-1/2 flex flex-wrap justify-center pb-2 md:pb-0">
+                    <DatePicker onChange={setEstDateStart} value={options.estDateStart} minDate={options.orderDate} />
+                    <div className="w-full text-sm text-gray-500 uppercase text-center">(Start)</div>
+                  </div>
+                  {options.estDateStart ? (
+                    <div className="w-full md:w-1/2 flex flex-wrap justify-center">
+                      <DatePicker onChange={setEstDateEnd} value={options.estDateEnd} minDate={options.estDateStart} />
+                      <div className="w-full text-sm text-gray-500 uppercase text-center">(End)</div>
+                    </div>
+                  ) : (
+                    <></>
+                  )}
                 </div>
-                <div className="w-full lg:w-1/2 flex flex-wrap justify-center">
-                  <DatePicker onChange={setEstDateEnd} value={options.estDateEnd} />
-                  <div className="w-full text-sm text-gray-500 uppercase text-center">(End)</div>
-                </div>
-              </div>
-            </OptionSection>
+              </OptionSection>
+            ) : (
+              <></>
+            )}
             <OptionSection>
               <SmallTitle>Delivery Location</SmallTitle>
               <div className="flex flex-wrap">
                 <select
-                  className="border border-gray-400 px-4 py-3 rounded-full mr-3 mb-3 transition-all text-sm"
+                  className="border border-gray-400 px-4 py-3 rounded-full mr-3 mb-3 transition-all text-sm appearance-none text-center"
                   onChange={updateLocation}
+                  value={options.location}
                 >
-                  <option value="" disabled selected>
+                  <option value="" disabled>
                     Choose Delivery Location
                   </option>
                   {locations.map((loc, index) => {
@@ -216,6 +231,17 @@ export default function OrderForm({ defaultOptions = null, selectedModel, onSubm
               <></>
             )}
             <div className="flex justify-center">
+              {cancelButton ? (
+                <button
+                  onClick={onCancel}
+                  className="bg-gray-200 text-gray-500 px-8 py-2 mr-4 rounded-full uppercase text-xl font-bold transition-all hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+              ) : (
+                <></>
+              )}
+
               {selectedModel &&
               options.exterior &&
               options.wheels &&
@@ -223,6 +249,7 @@ export default function OrderForm({ defaultOptions = null, selectedModel, onSubm
               options.orderDate &&
               options.estDateStart &&
               options.estDateEnd &&
+              options.location &&
               ((!selectedModel?.seatingLayouts.length && !options.seatingLayout) ||
                 (selectedModel?.seatingLayouts.length && options.seatingLayout)) &&
               (!options.pickedUp || (options.pickedUp && options.pickupDate)) ? (
@@ -230,7 +257,7 @@ export default function OrderForm({ defaultOptions = null, selectedModel, onSubm
                   onClick={() => onSubmit(options)}
                   className="bg-blue-600 text-white px-8 py-2 rounded-full uppercase text-xl font-bold transition-all hover:bg-blue-700"
                 >
-                  Submit
+                  {buttonText}
                 </button>
               ) : (
                 <></>

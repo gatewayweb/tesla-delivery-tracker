@@ -93,7 +93,7 @@ export default function Home({ models }) {
       estDateEnd: options.estDateEnd.toISOString(),
       pickupDate: options?.pickupDate ? options.pickupDate.toISOString() : null,
     };
-    console.log(data);
+    // console.log(data);
   };
 
   return (
