@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-
+import Head from 'next/head';
 import { toast } from 'react-toastify';
 
 import { getOrder } from '@lib/api';
+import validateOrder from '@lib/validate-order';
 import OrderForm from '@components/order-form';
 
 const formatDate = (dateString) => {
@@ -41,19 +42,7 @@ export default function MyOrder({ order }) {
 
   const onSubmit = async () => {
     setLoading(true);
-    if (
-      data?.model &&
-      data.exterior &&
-      data.wheel &&
-      data.interior &&
-      data.orderDate &&
-      data.estimatedDeliveryDateStart &&
-      data.estimatedDeliveryDateEnd &&
-      data.location &&
-      ((!data?.model?.seatingLayouts.length && !data.seatingLayout) ||
-        (data?.model?.seatingLayouts.length && data.seatingLayout)) &&
-      (!data?.pickedUp || (data?.pickedUp && data?.pickupDate))
-    ) {
+    if (validateOrder(data)) {
       const orderData = {
         ...data,
         orderDate: data.orderDate.toISOString(),
@@ -92,7 +81,7 @@ export default function MyOrder({ order }) {
         <title>Tesla Delivery Tracker | My Order</title>
       </Head>
       <div className="container w-full flex flex-col items-center">
-        <div className="pb-6 w-full flex flex-col items-center">
+        <div className="pb-12 w-full flex flex-col items-center">
           <h1 className="text-4xl">My Order</h1>
           <div className="uppercase text-sm text-gray-500 pt-2">
             <strong>Order ID:</strong> {data.id}

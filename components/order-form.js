@@ -4,6 +4,7 @@ import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
 
 import locations from '@lib/locations';
+import validateOrder from '@lib/validate-order';
 
 const Choice = ({ children, onClick, active }) => {
   return (
@@ -257,17 +258,7 @@ export default function OrderForm({
                 <></>
               )}
 
-              {selectedModel &&
-              options.exterior &&
-              options.wheel &&
-              options.interior &&
-              options.orderDate &&
-              options.estimatedDeliveryDateStart &&
-              options.estimatedDeliveryDateEnd &&
-              options.location &&
-              ((!selectedModel?.seatingLayouts.length && !options.seatingLayout) ||
-                (selectedModel?.seatingLayouts.length && options.seatingLayout)) &&
-              (!options.pickedUp || (options.pickedUp && options.pickupDate)) ? (
+              {validateOrder({ ...options, model: selectedModel }) ? (
                 <button
                   disabled={loading}
                   onClick={() => onSubmit(options)}

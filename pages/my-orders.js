@@ -1,12 +1,13 @@
 import Link from 'next/link';
+import Head from 'next/head';
 import { useEffect, useState } from 'react';
 
 const LineItem = ({ name, id }) => {
   return (
     <Link href={`/order/${id}`}>
-      <a className="flex flex-wrap items-center w-full justify-between border border-gray-300 rounded-full py-4 px-6 mb-4">
+      <a className="flex flex-wrap items-center w-full justify-between border border-gray-300 rounded-full py-4 px-6 mb-4 transition-all hover:border-gray-500">
         {name}
-        <div className="font-bold w-full md:w-auto">{id}</div>
+        <div className="font-bold w-full md:w-auto uppercase">ID: {id}</div>
       </a>
     </Link>
   );
@@ -36,6 +37,13 @@ export default function Orders() {
             {orders.map((order, index) => {
               return <LineItem key={index} name={order.name} id={order.id} />;
             })}
+            <div className="pt-6">
+              <Link href="/add-order">
+                <a className="bg-blue-600 text-white px-8 py-2 rounded-full uppercase text-xl font-bold transition-all hover:bg-blue-700 disabled:opacity-50">
+                  Add Another
+                </a>
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="pt-12 flex flex-col items-center">

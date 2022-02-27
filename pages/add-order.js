@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 import { toast } from 'react-toastify';
 
 import { getModels } from '@lib/api';
+import validateOrder from '@lib/validate-order';
 import OrderForm from '@components/order-form';
 
 const Choice = ({ children, onClick, active }) => {
@@ -39,19 +41,7 @@ export default function Home({ models }) {
 
   const onSubmit = async (options) => {
     setLoading(true);
-    if (
-      selectedModel &&
-      options.exterior &&
-      options.wheel &&
-      options.interior &&
-      options.orderDate &&
-      options.estimatedDeliveryDateStart &&
-      options.estimatedDeliveryDateEnd &&
-      options.location &&
-      ((!selectedModel?.seatingLayouts.length && !options.seatingLayout) ||
-        (selectedModel?.seatingLayouts.length && options.seatingLayout)) &&
-      (!options.pickedUp || (options.pickedUp && options.pickupDate))
-    ) {
+    if (validateOrder({ ...options, model: selectedModel })) {
       const data = {
         ...options,
         orderDate: options.orderDate.toISOString(),
