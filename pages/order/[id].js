@@ -27,9 +27,6 @@ const LineItem = ({ name, value }) => {
 };
 
 export default function MyOrder({ order }) {
-  if (!order || !order.id) {
-    return <div className="pt-12 text-lg text-center">Order not found.</div>;
-  }
   order.orderDate = formatDate(order.dates.orderDate);
   order.pickupDate = formatDate(order.dates.pickupDate);
   order.estimatedDeliveryDateStart = formatDate(order.dates.estimatedDeliveryDateStart);
@@ -40,6 +37,9 @@ export default function MyOrder({ order }) {
   const [data, setData] = useState(order);
 
   if (!data) return <>Loading...</>;
+  if (!order || !order.id) {
+    return <div className="pt-12 text-lg text-center">Order not found.</div>;
+  }
 
   const onSubmit = async () => {
     setLoading(true);
