@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { toast } from 'react-toastify';
 
@@ -38,7 +37,14 @@ export default function MyOrder({ order }) {
 
   if (!data) return <>Loading...</>;
   if (!order || !order.id) {
-    return <div className="pt-12 text-lg text-center">Order not found.</div>;
+    return (
+      <>
+        <Head>
+          <title>Tesla Delivery Tracker | My Order</title>
+        </Head>
+        <div className="pt-12 text-lg text-center">Order not found.</div>
+      </>
+    );
   }
 
   const onSubmit = async () => {
